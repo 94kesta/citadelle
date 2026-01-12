@@ -3,86 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>J-EAK_CORE</title>
+    <title>SSTC_CORE_ACCESS</title>
     <style>
+        /* Supprime les marges et les bugs d'affichage */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        body, html { background: #000; width: 100%; height: 100%; overflow: hidden; font-family: monospace; }
 
-        /* FOND MATRIX */
-        #m { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.3; }
+        /* Le fond Matrix */
+        #c { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.3; }
 
-        /* L'INTERFACE PRO */
-        .layer {
+        /* Conteneur principal */
+        .main {
             position: relative; z-index: 10; height: 100vh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #00ff41; text-align: center; padding: 20px;
+            color: #0f0; text-align: center;
         }
 
-        /* LE VISAGE DE J-EAK (IMAGE REELLE) */
-        #j-face {
-            width: 90%; max-width: 350px; border-radius: 10px;
-            box-shadow: 0 0 30px #00a2ff; display: none;
-            border: 1px solid #00a2ff; margin-bottom: 20px;
-            animation: boot 1.5s ease-out;
+        /* L'IMAGE DE J-EAK (Celle de ton fichier) */
+        #jeak-head {
+            width: 85%; max-width: 380px; 
+            border: 2px solid #00d9ff; 
+            box-shadow: 0 0 30px #00d9ff;
+            display: none; /* Apparaît au clic */
+            margin-bottom: 20px;
+            animation: glitch-in 0.5s ease;
         }
 
-        @keyframes boot { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes glitch-in {
+            0% { opacity: 0; transform: scale(0.5) skew(20deg); }
+            100% { opacity: 1; transform: scale(1) skew(0deg); }
+        }
 
+        /* Bouton Pro */
         .btn {
-            background: transparent; color: #00ff41; border: 2px solid #00ff41;
-            padding: 20px 30px; font-size: 1rem; letter-spacing: 2px;
-            cursor: pointer; text-transform: uppercase;
+            background: rgba(0, 255, 0, 0.1); color: #0f0;
+            border: 1px solid #0f0; padding: 15px 25px;
+            font-family: monospace; cursor: pointer; text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        #log { display: none; font-size: 0.8rem; margin-top: 15px; background: rgba(0,20,0,0.8); padding: 10px; }
+        #terminal-log {
+            display: none; font-size: 10px; margin-top: 20px;
+            text-align: left; background: rgba(0,0,0,0.7); padding: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="m"></canvas>
+    <canvas id="c"></canvas>
 
-    <div class="layer">
-        <div id="setup">
-            <button class="btn" onclick="run()">[ INITIALISER LE NOYAU ]</button>
+    <div class="main">
+        <div id="init">
+            <button class="btn" onclick="boot()">[ INITIALISER LE NOYAU ]</button>
         </div>
 
-        <img id="j-face" src="https://i.ibb.co/Vv0F9pX/1000001247.jpg" alt="J-EAK">
+        <img id="jeak-head" src="https://i.ibb.co/Vv0F9pX/1000001247.jpg" alt="CORE">
 
-        <div id="log">
-            > J-EAK : "SYSTÈME PRÊT"<br>
-            > RÉSILIENCE // LIBERTÉ<br>
-            > PROTOCOLE 07 CHARGÉ
+        <div id="terminal-log">
+            > CHARGEMENT STAR_T_COIN PROTOCOLS... OK<br>
+            > LIQUIDITÉ : SÉCURISÉE [cite: 12-01-2026]<br>
+            > ÉTAT : SOUVERAIN // J-EAK EN LIGNE
         </div>
     </div>
 
 <script>
-    const c = document.getElementById('m');
-    const x = c.getContext('2d');
-    c.width = window.innerWidth; c.height = window.innerHeight;
-    const s = "01STAR-T-COIN-J-EAK-CITADELLE";
-    const f = 14; const cols = c.width / f; const d = Array(Math.floor(cols)).fill(1);
+    const cvs = document.getElementById('c');
+    const ctx = cvs.getContext('2d');
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    const txt = "0101STAR-T-COIN-J-EAK-RESILIENCE-LIBERTE";
+    const drops = Array(Math.floor(cvs.width / 14)).fill(1);
 
     function draw() {
-        x.fillStyle = "rgba(0,0,0,0.05)"; x.fillRect(0,0,c.width,c.height);
-        x.fillStyle = "#0f0"; x.font = f + "px monospace";
-        d.forEach((y, i) => {
-            x.fillText(s[Math.floor(Math.random()*s.length)], i*f, y*f);
-            if(y*f > c.height && Math.random() > 0.975) d[i] = 0; d[i]++;
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,cvs.width,cvs.height);
+        ctx.fillStyle = "#0f0"; ctx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(txt[Math.floor(Math.random()*txt.length)], i*14, y*14);
+            if(y*14 > cvs.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
         });
     }
     setInterval(draw, 35);
 
-    function run() {
-        document.getElementById('setup').style.display = 'none';
-        document.getElementById('j-face').style.display = 'block';
-        document.getElementById('log').style.display = 'block';
+    function boot() {
+        document.getElementById('init').style.display = 'none';
+        document.getElementById('jeak-head').style.display = 'block';
+        document.getElementById('terminal-log').style.display = 'block';
     }
 </script>
 </body>
 </html>
-        document.getElementById('jeak-face').style.display = 'block';
-        document.getElementById('log').style.display = 'block';
-    }
 </script>
 </body>
 </html>
