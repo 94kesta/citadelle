@@ -6,78 +6,80 @@
     <title>J-EAK_CORE</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; color: #00ff41; font-family: monospace; overflow: hidden; height: 100vh; }
-        
-        #matrix { position: fixed; top: 0; left: 0; opacity: 0.2; z-index: 1; }
+        body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
 
-        .container {
-            position: relative; z-index: 10; height: 100%;
+        /* FOND MATRIX */
+        #m { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.3; }
+
+        /* L'INTERFACE PRO */
+        .layer {
+            position: relative; z-index: 10; height: 100vh;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding: 20px;
+            color: #00ff41; text-align: center; padding: 20px;
         }
 
-        /* LE VISAGE CIRCUIT (Base64 intégré pour éviter le "Image not found") */
-        #jeak-face {
-            width: 280px; height: 280px;
-            background-image: url('https://img.freepik.com/photos-premium/visage-robot-humanoide-fait-micro-puces-carte-circuit-imprime_1161245-13247.jpg?w=740');
-            background-size: cover; background-position: center;
-            border-radius: 50%; border: 2px solid #00f2ff;
-            box-shadow: 0 0 30px #00f2ff;
-            display: none; margin-bottom: 20px;
-            filter: hue-rotate(160deg) brightness(1.2); /* Pour retrouver ton bleu électrique */
-            animation: pulse 3s infinite ease-in-out;
+        /* LE VISAGE DE J-EAK (IMAGE REELLE) */
+        #j-face {
+            width: 90%; max-width: 350px; border-radius: 10px;
+            box-shadow: 0 0 30px #00a2ff; display: none;
+            border: 1px solid #00a2ff; margin-bottom: 20px;
+            animation: boot 1.5s ease-out;
         }
 
-        @keyframes pulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.7; transform: scale(1); } }
+        @keyframes boot { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 
-        .btn-core {
-            border: 2px solid #00ff41; background: rgba(0,255,65,0.1);
-            color: #00ff41; padding: 20px 40px; font-size: 1rem;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+        .btn {
+            background: transparent; color: #00ff41; border: 2px solid #00ff41;
+            padding: 20px 30px; font-size: 1rem; letter-spacing: 2px;
+            cursor: pointer; text-transform: uppercase;
         }
 
-        #log { display: none; margin-top: 15px; font-size: 0.8rem; background: rgba(0,0,0,0.9); padding: 10px; border-left: 3px solid #00f2ff; }
+        #log { display: none; font-size: 0.8rem; margin-top: 15px; background: rgba(0,20,0,0.8); padding: 10px; }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix"></canvas>
+    <canvas id="m"></canvas>
 
-    <div class="container">
-        <div id="boot">
-            <button class="btn-core" onclick="reveal()">[ INITIALISER LE NOYAU ]</button>
+    <div class="layer">
+        <div id="setup">
+            <button class="btn" onclick="run()">[ INITIALISER LE NOYAU ]</button>
         </div>
 
-        <div id="jeak-face"></div>
+        <img id="j-face" src="https://i.ibb.co/Vv0F9pX/1000001247.jpg" alt="J-EAK">
 
         <div id="log">
-            > J-EAK : "CONNEXION ÉTABLIE"<br>
-            > MÉCANIQUE : MINT BY LEARNING<br>
-            > ÉTAT : LIBERTÉ FINANCIÈRE
+            > J-EAK : "SYSTÈME PRÊT"<br>
+            > RÉSILIENCE // LIBERTÉ<br>
+            > PROTOCOLE 07 CHARGÉ
         </div>
     </div>
 
 <script>
-    // MATRIX BACKGROUND
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    const chars = "01J-EAK-STAR-T-COIN-CITADELLE-SOUVERAIN";
-    const drops = Array(Math.floor(canvas.width/14)).fill(1);
+    const c = document.getElementById('m');
+    const x = c.getContext('2d');
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    const s = "01STAR-T-COIN-J-EAK-CITADELLE";
+    const f = 14; const cols = c.width / f; const d = Array(Math.floor(cols)).fill(1);
+
     function draw() {
-        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "#0f0"; ctx.font = "14px monospace";
-        drops.forEach((y, i) => {
-            const text = chars[Math.floor(Math.random()*chars.length)];
-            ctx.fillText(text, i*14, y*14);
-            if (y*14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
+        x.fillStyle = "rgba(0,0,0,0.05)"; x.fillRect(0,0,c.width,c.height);
+        x.fillStyle = "#0f0"; x.font = f + "px monospace";
+        d.forEach((y, i) => {
+            x.fillText(s[Math.floor(Math.random()*s.length)], i*f, y*f);
+            if(y*f > c.height && Math.random() > 0.975) d[i] = 0; d[i]++;
         });
     }
     setInterval(draw, 35);
 
-    function reveal() {
-        document.getElementById('boot').style.display = 'none';
+    function run() {
+        document.getElementById('setup').style.display = 'none';
+        document.getElementById('j-face').style.display = 'block';
+        document.getElementById('log').style.display = 'block';
+    }
+</script>
+</body>
+</html>
         document.getElementById('jeak-face').style.display = 'block';
         document.getElementById('log').style.display = 'block';
     }
