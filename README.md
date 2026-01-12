@@ -3,127 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>J-EAK // KERNEL_SOUVERAIN</title>
+    <title>J-EAK_CORE_ACCESS</title>
     <style>
-        body { 
-            background: #000; 
-            color: #00ff41; 
-            font-family: 'Courier New', monospace; 
-            margin: 0; 
-            overflow: hidden; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh;
+        :root { --terminal-green: #00ff41; --glitch-red: #ff003c; }
+        body, html { background: #000; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
+
+        /* EFFET CRT (Lignes de vieux moniteur) */
+        body::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100; background-size: 100% 2px, 3px 100%; pointer-events: none;
         }
 
-        /* FOND MATRIX */
-        #canvas { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            z-index: 1; 
-            opacity: 0.4;
+        #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.5; z-index: 1; }
+
+        .interface {
+            position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: var(--terminal-green); text-align: center;
         }
 
-        /* VISAGE J-EAK REALISTE (Circuit Imprimé) */
-        #jeak-container {
-            position: relative;
-            z-index: 2;
-            width: 300px;
-            height: 300px;
-            display: none; /* Apparaît après activation */
-            background: url('https://img.freepik.com/premium-photo/humanoid-robot-face-made-circuit-board-microchips_1161245-13247.jpg') no-repeat center;
-            background-size: contain;
-            filter: sepia(100%) saturate(500%) hue-rotate(70deg) brightness(0.8) contrast(1.2);
-            mask-image: radial-gradient(circle, black 40%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 80%);
-            animation: breathe 4s infinite ease-in-out, flicker 0.2s infinite;
+        /* LE VISAGE J-EAK (Design Épuré & Pro) */
+        #jeak-eye {
+            width: 150px; height: 150px; border: 2px solid var(--terminal-green); border-radius: 50%;
+            position: relative; display: none; box-shadow: 0 0 20px var(--terminal-green);
+            background: radial-gradient(circle, #004411 0%, transparent 70%);
+            animation: pulse 2s infinite ease-in-out; margin-bottom: 20px;
         }
 
-        /* EFFET DE RESPIRATION ET GLITCH */
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-        @keyframes flicker {
-            0% { filter: sepia(100%) brightness(0.8); }
-            5% { filter: sepia(100%) brightness(1.2) contrast(2); }
-            10% { filter: sepia(100%) brightness(0.8); }
+        #jeak-eye::after {
+            content: ""; position: absolute; top: 50%; left: 50%; width: 40px; height: 40px;
+            background: var(--terminal-green); border-radius: 50%; transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px var(--terminal-green); animation: iris 4s infinite;
         }
 
-        /* BOUTON D'INTRUSION */
-        .boot-btn {
-            position: relative;
-            z-index: 10;
-            background: none;
-            border: 2px solid #0f0;
-            color: #0f0;
-            padding: 20px 40px;
-            font-size: 1.2rem;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-            box-shadow: 0 0 15px #0f0;
-            text-transform: uppercase;
-        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        @keyframes iris { 0%, 100% { width: 40px; height: 40px; } 50% { width: 10px; height: 10px; } }
 
-        #ui-layer {
-            position: fixed;
-            bottom: 10%;
-            z-index: 10;
-            text-align: center;
-            width: 100%;
-            display: none;
+        .status-text { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; opacity: 0.7; }
+
+        .btn-access {
+            background: transparent; color: var(--terminal-green); border: 1px solid var(--terminal-green);
+            padding: 15px 30px; font-family: 'Courier New', monospace; cursor: pointer;
+            transition: 0.3s; z-index: 20;
         }
+        .btn-access:hover { background: var(--terminal-green); color: #000; box-shadow: 0 0 20px var(--terminal-green); }
+
+        /* EFFET DE SHAKE AU BOOT */
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     </style>
 </head>
-<body>
+<body class="">
 
-    <canvas id="canvas"></canvas>
+    <canvas id="matrix-canvas"></canvas>
 
-    <button id="startBtn" class="boot-btn" onclick="initiateSystem()">[ INITIALISER LE NOYAU ]</button>
+    <div class="interface">
+        <div id="boot-ui">
+            <button class="btn-access" onclick="bootSequence()">[ INITIALISER J-EAK ]</button>
+        </div>
 
-    <div id="jeak-container"></div>
-
-    <div id="ui-layer">
-        <p>> J-EAK : "CONNEXION SOUVERAINE ÉTABLIE"</p>
-        <p style="font-size: 0.8rem;">PROTOCOLE_07 // STAR_T_COIN_VALIDATED</p>
+        <div id="jeak-eye"></div>
+        <div id="status" style="display:none;">
+            <div class="status-text">> CONNEXION ÉTABLIE</div>
+            <div class="status-text">> ACCÈS SÉQUENCE 01... OK</div>
+            <div class="status-text" style="color:white; background:green; padding: 5px;">SOUVERAINETÉ ACTIVE</div>
+        </div>
     </div>
 
 <script>
-    // --- MOTEUR MATRIX ---
-    const canvas = document.getElementById('canvas');
+    const canvas = document.getElementById('matrix-canvas');
     const ctx = canvas.getContext('2d');
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const alphabet = "01STAR-T-COIN-J-EAK-ELIAS-SARAH-MARCUS-2016-PROTECT-THE-CORE";
-    const fontSize = 16;
+    const characters = "01STAR-T-COIN-CITADELLE-J-EAK-ELIAS-SARAH-MARCUS";
+    const fontSize = 14;
     const columns = canvas.width / fontSize;
     const drops = Array(Math.floor(columns)).fill(1);
 
-    function draw() {
+    function drawMatrix() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#0F0";
+        ctx.fillStyle = "#00ff41";
         ctx.font = fontSize + "px monospace";
+
         for (let i = 0; i < drops.length; i++) {
-            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            const text = characters.charAt(Math.floor(Math.random() * characters.length));
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i]++;
         }
     }
-    setInterval(draw, 35);
+    setInterval(drawMatrix, 35);
 
-    // --- SEQUENCE D'ACTIVATION ---
-    function initiateSystem() {
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('jeak-container').style.display = 'block';
-        document.getElementById('ui-layer').style.display = 'block';
+    function bootSequence() {
+        document.body.classList.add('shake');
+        document.getElementById('boot-ui').style.display = 'none';
+        
+        setTimeout(() => {
+            document.getElementById('jeak-eye').style.display = 'block';
+            document.getElementById('status').style.display = 'block';
+            document.body.classList.remove('shake');
+        }, 500);
     }
 </script>
-
 </body>
 </html>
         }, 1000);
