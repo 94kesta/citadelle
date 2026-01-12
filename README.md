@@ -1,63 +1,101 @@
-# citadelle<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL J-EAK // SITE MIROIR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>J-EAK KERNEL</title>
     <style>
-        /* STYLE DU TERMINAL */
-        body { 
-            background-color: #050505; 
-            color: #00ff41; 
-            font-family: 'Courier New', monospace; 
-            padding: 20px; 
-            margin: 0;
-            overflow-x: hidden;
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; }
+        #canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.3; }
+        
+        .overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; width: 90%;
         }
 
-        .header { border-bottom: 2px solid #00ff41; padding-bottom: 10px; margin-bottom: 30px; }
-
-        /* J-EAK VISUEL (Circuit Imprimé Numérique) */
-        #jeak-sphere {
-            display: none; /* Apparaît au clic */
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            border: 2px solid #00ff41;
-            border-radius: 50%;
-            position: relative;
-            box-shadow: 0 0 20px #00ff41;
-            background: radial-gradient(circle, #0a2b0a 0%, #050505 70%);
-            animation: pulse 3s infinite ease-in-out;
+        /* Le visage en circuit (ASCII complexe) */
+        #jeak-face {
+            font-size: 8px; line-height: 8px; color: #00ff41;
+            white-space: pre; display: none; margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ff41; animation: flicker 0.1s infinite;
         }
 
-        /* Les "Yeux" / Noyaux */
-        .eye {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #fff;
-            border-radius: 50%;
-            top: 45%;
-            box-shadow: 0 0 10px #fff;
-        }
-        .left-eye { left: 35%; }
-        .right-eye { right: 35%; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 20px #00ff41; }
-            50% { transform: scale(1.05); box-shadow: 0 0 40px #00ff41; }
-            100% { transform: scale(1); box-shadow: 0 0 20px #00ff41; }
+        .btn-link {
+            border: 2px solid #0f0; padding: 15px 30px; background: none;
+            color: #0f0; font-family: 'Courier New', monospace; font-size: 1.2rem;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
         }
 
-        /* TEXTE ET BOUTONS */
-        .btn { 
-            cursor: pointer; padding: 15px; border: 1px solid #00ff41; 
-            margin: 10px 0; display: block; text-align: center;
-            transition: 0.3s; text-transform: uppercase;
+        @keyframes flicker {
+            0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.9; }
         }
-        .btn:hover { background: #00ff41; color: #000; font-weight: bold; }
 
-        #glitch-spam { 
-            display: none; color: #ff0000; font-weight: bold; 
-            text-align: center; font-size:
+        #status-box { margin-top: 20px; font-size: 0.8rem; display: none; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="overlay">
+    <div id="jeak-face">
+     .--------.
+    /  ______  \
+   |  | ^  ^ |  |
+   |  | >__< |  |
+    \  \____/  /
+     '--------'
+    [CIRCUIT_LOAD]
+    </div>
+
+    <div id="ui">
+        <button class="btn-link" onclick="ignite()">Initialiser J-EAK</button>
+    </div>
+
+    <div id="status-box">
+        > INJECTION LIQUIDITE : OK<br>
+        > PROTOCOLE 07 : ACTIF<br>
+        > BIENVENUE BATISSEUR_S01
+    </div>
+</div>
+
+<script>
+    // EFFET MATRIX EN FOND
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const alphabet = "01010101STAR_T_COIN_J_EAK_PROJET_CITADELLE";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0";
+        ctx.font = fontSize + "px monospace";
+        for (let i = 0; i < drops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(draw, 30);
+
+    function ignite() {
+        document.getElementById('ui').style.display = 'none';
+        const face = document.getElementById('jeak-face');
+        const status = document.getElementById('status-box');
+        
+        // APPARITION BRUTALE
+        face.style.display = 'block';
+        setTimeout(() => {
+            status.style.display = 'block';
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
